@@ -3,12 +3,13 @@ Created on Jul 27, 2015
 
 @author: hsorby
 '''
+import os.path
 
 from PySide import QtGui, QtCore
 
-from ui_mono2dwidget import Ui_Mono2DWidget
+from mapclientplugins.monodomain2dstep.ui_mono2dwidget import Ui_Mono2DWidget
 
-from mono2dmodel import Mono2DModel
+from mapclientplugins.monodomain2dstep.mono2dmodel import Mono2DModel
 
 class Mono2DWidget(QtGui.QWidget):
     '''
@@ -44,7 +45,7 @@ class Mono2DWidget(QtGui.QWidget):
         self._model_converged.clear()
         self._model_experimental.clear()
         
-    def initialise(self):
+    def initialise(self, data_location):
         self._model_converged.initialise()
         self._model_experimental.initialise()
         self._ui.pushButtonPlayStop.setText('Play')
@@ -54,16 +55,23 @@ class Mono2DWidget(QtGui.QWidget):
         dis = self._model_experimental.getDis()
         self._ui.spinBoxXDiscretisation.setValue(dis[0])
         self._ui.spinBoxYDiscretisation.setValue(dis[1])
-        self._timer.setInterval(1) #*self._model_experimental.getTimeStep())
+        self._timer.setInterval(0) #*self._model_experimental.getTimeStep())
 
-        self._model_converged.setLocation('Monodomain2D/converged')
-        self._model_experimental.setLocation('Monodomain2D/experimental')
+        
+        self._model_converged.setLocation(os.path.join(data_location, 'Monodomain2D/converged'))
+        self._model_experimental.setLocation(os.path.join(data_location, 'Monodomain2D/experimental'))
+        self._model_converged.setIronPath(os.path.join(data_location, 'bin'))
+        self._model_experimental.setIronPath(os.path.join(data_location, 'bin'))
 
         self._model_converged.simulate(0.1, [7, 7])
-        self._model_converged.createVisualisation()       
+        self._model_converged.createVisualisation()
 #         self._model_experimental.simulate(0.1, [dis[0], dis[1]])
 #         self._model_experimental.createVisualisation()
-        
+
+    def _tweakView(self):
+        p = self._ui.widgetSceneviewerConverged.getViewParameters()
+        print(p)
+
     def _makeConnections(self):
         self._ui.pushButtonContinue.clicked.connect(self._continueClicked)
         self._ui.pushButtonSimulate.clicked.connect(self._simulateClicked)
@@ -84,6 +92,11 @@ class Mono2DWidget(QtGui.QWidget):
             sceneviewer.setScene(scene)
             sceneviewer.viewAll()
             sceneviewer.setPerturbLinesFlag(True)
+            # We need to tweak the view slightly so that we
+            # can see the lines of the elements.
+            _, v = sceneviewer.getEyePosition()
+            v[1] += 0.01
+            sceneviewer.setEyePosition(v)
         
     def _continueClicked(self):
         self._callback()
@@ -100,6 +113,7 @@ class Mono2DWidget(QtGui.QWidget):
 #         self._model_experimental.clearVisualisation()
         self._model_experimental.simulate(step_size, [x_dis, y_dis])
         self._model_experimental.createVisualisation()
+        self._ui.widgetSceneviewerExperimental.viewAll()
         QtGui.QApplication.restoreOverrideCursor()
         
     def _setSliderValues(self):

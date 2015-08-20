@@ -53,5 +53,12 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
+# Eclipse generated files
+.project
+.pydevproject
+.settings/
+
 # PyBuilder
 target/
+
+

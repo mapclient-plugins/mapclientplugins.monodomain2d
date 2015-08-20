@@ -28,7 +28,7 @@ class monodomain2dStep(WorkflowStepMountPoint):
                       'http://physiomeproject.org/workflow/1.0/rdf-schema#uses',
                       'sedml'))
         # Port data:
-        self._portData0 = None # somethinig
+        self._data_location = None # sedml location
         # Config:
         self._config = {}
         self._config['identifier'] = ''
@@ -46,7 +46,7 @@ class monodomain2dStep(WorkflowStepMountPoint):
             self._view = Mono2DWidget()
             self._view.registerCallback(self._doneExecution)
             
-        self._view.initialise()
+        self._view.initialise(self._data_location)
         
         self._setCurrentWidget(self._view)
 
@@ -56,7 +56,7 @@ class monodomain2dStep(WorkflowStepMountPoint):
         The index is the index of the port in the port list.  If there is only one
         uses port for this step then the index can be ignored.
         '''
-        self._portData0 = dataIn # somethinig
+        self._data_location = dataIn # somethinig
 
     def configure(self):
         '''
