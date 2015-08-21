@@ -93,7 +93,7 @@ class Mono2DWidget(QtGui.QWidget):
             sceneviewer.viewAll()
             sceneviewer.setPerturbLinesFlag(True)
             # We need to tweak the view slightly so that we
-            # can see the lines of the elements.
+            # can see the lines of the elements. 
             _, v = sceneviewer.getEyePosition()
             v[1] += 0.01
             sceneviewer.setEyePosition(v)
@@ -147,7 +147,7 @@ class Mono2DWidget(QtGui.QWidget):
         """
         value = self._ui.horizontalSliderTime.value()
         max_value = self._ui.horizontalSliderTime.maximum()
-        value += 1
+        value += 50
         if max_value < value:
             value = 0
 

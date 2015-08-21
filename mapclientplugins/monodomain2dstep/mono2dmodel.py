@@ -45,7 +45,7 @@ class Mono2DModel(object):
         self._min_time = 0.0
         self._max_time = 300.0
         self._step_size = 0.1
-        self._time_step = 1.0
+        self._time_step = 0.1
         self._x_dis = 4
         self._y_dis = 4
         
@@ -89,10 +89,9 @@ class Mono2DModel(object):
         self._step_size = step_size
         self._x_dis = dis[0]
         self._y_dis = dis[1]
+        cellml_file = os.path.join(self._iron_path, 'cellml-models', 'n98.xml')
         
-        proc = subprocess.Popen([os.path.join(self._iron_path, 'iron'), str(step_size), str(dis[0]), str(dis[1])],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-#         proc = subprocess.Popen(['/home/hsorby/work/musculoskeletal-software/test-application/iron', str(step_size), str(dis[0]), str(dis[1])],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-#         stdout, stderr = proc.communicate()
+        proc = subprocess.Popen([os.path.join(self._iron_path, 'iron', 'monodomain'), '0.01', '3.0', '10', cellml_file, str(dis[0]), str(dis[1])],stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         proc.communicate()
         self.loadSimulation()
         
