@@ -118,4 +118,4 @@ class Ui_Mono2DWidget(object):
         self.label.setText(QtGui.QApplication.translate("Mono2DWidget", "Time:", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButtonPlayStop.setText(QtGui.QApplication.translate("Mono2DWidget", "Play", None, QtGui.QApplication.UnicodeUTF8))
 
-from monosceneviewerwidget import MonoSceneviewerWidget
+from mapclientplugins.monodomain2dstep.monosceneviewerwidget import MonoSceneviewerWidget

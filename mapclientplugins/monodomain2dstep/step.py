@@ -56,7 +56,7 @@ class monodomain2dStep(WorkflowStepMountPoint):
         The index is the index of the port in the port list.  If there is only one
         uses port for this step then the index can be ignored.
         '''
-        self._data_location = dataIn # somethinig
+        self._data_location = dataIn # something
 
     def configure(self):
         '''

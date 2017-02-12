@@ -60,11 +60,15 @@ class Mono2DWidget(QtGui.QWidget):
         
         self._model_converged.setLocation(os.path.join(data_location, 'Monodomain2D/converged'))
         self._model_experimental.setLocation(os.path.join(data_location, 'Monodomain2D/experimental'))
-        self._model_converged.setIronPath(os.path.join(data_location, 'bin'))
-        self._model_experimental.setIronPath(os.path.join(data_location, 'bin'))
+        self._model_converged.setSimulationRoot(data_location)
+        self._model_experimental.setSimulationRoot(data_location)
+        # self._model_converged.setIronPath(os.path.join(data_location, 'bin'))
+        # self._model_experimental.setIronPath(os.path.join(data_location, 'bin'))
 
-        self._model_converged.simulate(0.1, [7, 7])
+        # self._model_converged.simulate(0.1, [7, 7])
+        self._model_converged.loadSimulation()
         self._model_converged.createVisualisation()
+        self._initialiseConvergedSceneviewer()
 #         self._model_experimental.simulate(0.1, [dis[0], dis[1]])
 #         self._model_experimental.createVisualisation()
 
@@ -83,20 +87,32 @@ class Mono2DWidget(QtGui.QWidget):
         
     def _graphicsInitialized(self):
         sender = self.sender()
-        sceneviewer = sender.getSceneviewer()
+        if sender is self._ui.widgetSceneviewerConverged:
+            self._initialiseConvergedSceneviewer()
+        elif sender is self._ui.widgetSceneviewerExperimental:
+            self._initialiseExperimentalSceneviewer()
+
+    def _initialiseExperimentalSceneviewer(self):
+        sceneviewer = self._ui.widgetSceneviewerExperimental.getSceneviewer()
         if sceneviewer is not None:
-            if sender is self._ui.widgetSceneviewerConverged:
-                scene = self._model_converged.getRegion().getScene()
-            elif sender is self._ui.widgetSceneviewerExperimental:
-                scene = self._model_experimental.getRegion().getScene()
-            sceneviewer.setScene(scene)
-            sceneviewer.viewAll()
-            sceneviewer.setPerturbLinesFlag(True)
-            # We need to tweak the view slightly so that we
-            # can see the lines of the elements. 
-            _, v = sceneviewer.getEyePosition()
-            v[1] += 0.01
-            sceneviewer.setEyePosition(v)
+            scene = self._model_experimental.getRegion().getScene()
+            self._resetScene(sceneviewer, scene)
+
+    def _initialiseConvergedSceneviewer(self):
+        sceneviewer = self._ui.widgetSceneviewerConverged.getSceneviewer()
+        if sceneviewer is not None:
+            scene = self._model_converged.getRegion().getScene()
+            self._resetScene(sceneviewer, scene)
+
+    def _resetScene(self, sceneviewer, scene):
+        sceneviewer.setScene(scene)
+        sceneviewer.viewAll()
+        sceneviewer.setPerturbLinesFlag(True)
+        # We need to tweak the view slightly so that we
+        # can see the lines of the elements. 
+        _, v = sceneviewer.getEyePosition()
+        v[1] += 0.01
+        sceneviewer.setEyePosition(v)
         
     def _continueClicked(self):
         self._callback()
@@ -110,8 +126,11 @@ class Mono2DWidget(QtGui.QWidget):
         step_size = self._ui.doubleSpinBoxStepSize.value()
         
         QtGui.QApplication.setOverrideCursor(QtCore.Qt.WaitCursor)
-#         self._model_experimental.clearVisualisation()
+        self._model_experimental.initialise()
+        self._model_experimental.clearVisualisation()
+        self._initialiseExperimentalSceneviewer()
         self._model_experimental.simulate(step_size, [x_dis, y_dis])
+        self._model_experimental.loadSimulation()
         self._model_experimental.createVisualisation()
         self._ui.widgetSceneviewerExperimental.viewAll()
         QtGui.QApplication.restoreOverrideCursor()
@@ -130,7 +149,7 @@ class Mono2DWidget(QtGui.QWidget):
         step_size = self._model_experimental.getStepSize()
         time = self._model_experimental.getMinTime() + value * step_size
         self._ui.labelTime.setText('{:10.4f}'.format(time))
-        self._model_converged.setTime(10.0*time)
+        self._model_converged.setTime(time)
         self._model_experimental.setTime(time)
         
     def _timeChanged(self, value):
@@ -147,7 +166,7 @@ class Mono2DWidget(QtGui.QWidget):
         """
         value = self._ui.horizontalSliderTime.value()
         max_value = self._ui.horizontalSliderTime.maximum()
-        value += 50
+        value += 10
         if max_value < value:
             value = 0
 
