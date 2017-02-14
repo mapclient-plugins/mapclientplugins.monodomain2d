@@ -428,7 +428,7 @@ def solve(pde_time_step, end_time, output_freq, cellml_file, num_x_els, num_y_el
 
     # Set the stimulus on half the bottom nodes
     stimComponent = cellML.FieldComponentGet(noble98Model, iron.CellMLFieldTypes.PARAMETERS, "membrane/IStim")
-    for node in range(1,int(numberOfXElements/2 + 0.5)):
+    for node in range(1,int(numberOfXElements/2.0 + 0.5) + 1):
         nodeDomain = decomposition.NodeDomainGet(node,1)
         if nodeDomain == computationalNodeNumber:
             cellMLParametersField.ParameterSetUpdateNode(iron.FieldVariableTypes.U, iron.FieldParameterSetTypes.VALUES, 1, 1, node, stimComponent, stimValue)
@@ -502,7 +502,7 @@ def solve(pde_time_step, end_time, output_freq, cellml_file, num_x_els, num_y_el
     problem.Solve()
 
     # Now turn the stimulus off
-    for node in range(1,int(numberOfXElements/2 + 0.5)):
+    for node in range(1,int(numberOfXElements/2.0 + 0.5) + 1):
         nodeDomain = decomposition.NodeDomainGet(node,1)
         if nodeDomain == computationalNodeNumber:
             cellMLParametersField.ParameterSetUpdateNode(iron.FieldVariableTypes.U, iron.FieldParameterSetTypes.VALUES, 1, 1, node, stimComponent, 0.0)
