@@ -59,7 +59,6 @@ class Mono2DModel(object):
         self._location = None
         self._iron_path = None
         
-        
     def initialise(self):
         del self._region
         self._region = self._context.createRegion()
@@ -116,7 +115,6 @@ class Mono2DModel(object):
         sir = self._region.createStreaminformationRegion()
         files = glob(os.path.join(self._location, 'Time_2_*.part0.exnode'))
         sort_numerical_order(files)
-        sir.createStreamresourceFile(os.path.join(self._location, 'MonodomainExample.part0.exelem'))
         for f in files:
             fr = sir.createStreamresourceFile(f)
             m = rx.search(f)
@@ -125,6 +123,7 @@ class Mono2DModel(object):
             else:
                 print('Big problem not matching a time!!!!')
                 
+        sir.createStreamresourceFile(os.path.join(self._location, 'MonodomainExample.part0.exelem'))
         self._region.read(sir)
         
     def clearVisualisation(self):
